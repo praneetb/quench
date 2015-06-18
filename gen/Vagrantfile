@@ -1,0 +1,91 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  config.vm.define "chefserver" do |chefserver|
+    chefserver.vm.box = "precise"
+    chefserver.vm.hostname = "chefserver"
+    chefserver.vm.provision :shell, :path => "scripts/bootstrap_chefserver.sh"
+    chefserver.vm.network "private_network", ip: "10.0.33.10"
+    chefserver.vm.network "forwarded_port", guest: 80, host: 8080
+    chefserver.ssh.username = "root"
+    chefserver.ssh.password = "vagrant"
+    chefserver.ssh.insert_key = "true"
+  end
+
+  config.vm.define "node11" do |node11|
+    node11.vm.box = "precise"
+    node11.vm.hostname = "node11"
+    node11.vm.provision :shell, :path => "scripts/bootstrap_node.sh"
+    node11.vm.network "private_network", ip: "10.0.33.11"
+    node11.vm.network "forwarded_port", guest: 80, host: 9011
+    node11.ssh.username = "root"
+    node11.ssh.password = "vagrant"
+    node11.ssh.insert_key = "true"
+    node11.ohai.primary_nic = "eth1"
+    node11.vm.provision :chef_client do |chef|
+      chef.chef_server_url = "https://10.0.33.10"
+      chef.validation_client_name = "chef-validator"
+      chef.validation_key_path = "chef-validator.pem"
+      #chef.add_role "contrail-database"
+      #chef.add_role "contrail-config"
+      chef.delete_node = true
+      chef.delete_client = true
+    end
+  end
+
+  config.vm.define "node12" do |node12|
+    node12.vm.box = "precise"
+    node12.vm.hostname = "node12"
+    node12.vm.provision :shell, :path => "scripts/bootstrap_node.sh"
+    node12.vm.network "private_network", ip: "10.0.33.12"
+    node12.vm.network "forwarded_port", guest: 80, host: 9012
+    node12.ssh.username = "root"
+    node12.ssh.password = "vagrant"
+    node12.ssh.insert_key = "true"
+    node12.ohai.primary_nic = "eth1"
+    node12.vm.provision :chef_client do |chef|
+      chef.chef_server_url = "https://10.0.33.10"
+      chef.validation_client_name = "chef-validator"
+      chef.validation_key_path = "chef-validator.pem"
+      #chef.add_role "contrail-database"
+      #chef.add_role "contrail-config"
+      chef.delete_node = true
+      chef.delete_client = true
+    end
+  end
+
+  config.vm.define "node13" do |node13|
+    node13.vm.box = "precise"
+    node13.vm.hostname = "node13"
+    node13.vm.provision :shell, :path => "scripts/bootstrap_node.sh"
+    node13.vm.network "private_network", ip: "10.0.33.13"
+    node13.vm.network "forwarded_port", guest: 80, host: 9013
+    node13.ssh.username = "root"
+    node13.ssh.password = "vagrant"
+    node13.ssh.insert_key = "true"
+    node13.ohai.primary_nic = "eth1"
+    node13.vm.provision :chef_client do |chef|
+      chef.chef_server_url = "https://10.0.33.10"
+      chef.validation_client_name = "chef-validator"
+      chef.validation_key_path = "chef-validator.pem"
+      #chef.add_role "contrail-database"
+      #chef.add_role "contrail-config"
+      chef.delete_node = true
+      chef.delete_client = true
+    end
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    # Customize the amount of memory on the VM:
+    vb.memory = "8192"
+  end
+end
