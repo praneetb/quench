@@ -165,7 +165,6 @@ class QuenchCfgm(object):
         node_num = 11
         for index in range(self.num_vms):
             node_name = 'node' + str(node_num+index)
-            os.chdir(self.vagrant_root_dir)
             os.system("bash -x knife_check.sh %s" %(node_name))
 
         print("Updating roles in chef-server")
